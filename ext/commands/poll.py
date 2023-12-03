@@ -1,6 +1,9 @@
 import interactions
 import uuid
 from common.utils.consts import METADATA
+import re
+
+"(\-(.+)\n)+-(.+)"
 
 
 class Numbers():
@@ -47,6 +50,10 @@ class Poll(interactions.Extension):
         poll_embed = interactions.Embed(title=modal_ctx.responses["title"],
                                         description=description,
                                         color=ctx.author.top_role.color if ctx.guild else None)
+        
+        if not re.match("(\-(.+)\n)+-(.+)", modal_ctx.responses["options"]):
+            await modal_ctx.send("Invalid options provided. Please try again.", ephemeral=True)
+            return 
 
         poll_embed.set_author(name=ctx.author.user.tag if ctx.guild else ctx.author.tag,
                               icon_url=ctx.author.display_avatar.url)
