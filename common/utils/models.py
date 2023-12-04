@@ -3,17 +3,13 @@ from datetime import datetime
 
 from beanie import Document, Indexed
 
-__all__ = ("SINGLE_CHOICE_COMPONENT",)
+__all__ = ("EMBEDDED_MESSAGE",)
 
 
-class SINGLE_CHOICE_COMPONENT(Document):
-    # name: typing.Annotated[str, Indexed(str)]
-    # author_id: str
-    # description: str
-    # created_at: datetime
-    # last_edited_at: typing.Optional[datetime] = None
+class EMBEDDED_MESSAGE(Document):
     uuid: str
     author_id: int
     counts: dict[str, int]
     user_ids: dict[str, str]
     created_at: datetime
+    attachment: str

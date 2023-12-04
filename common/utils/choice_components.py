@@ -3,7 +3,7 @@ from enum import Enum
 import interactions
 
 from ext.commands.poll import Numbers
-from common.utils.models import SINGLE_CHOICE_COMPONENT
+from common.utils.models import EMBEDDED_MESSAGE
 import datetime
 from beanie import PydanticObjectId
 
@@ -46,7 +46,7 @@ class ChoiceButton:
     async def callback(self, option):
         self.message_uuid = self.ctx.component.custom_id.split("?")[1]
 
-        message_object_on_db = await SINGLE_CHOICE_COMPONENT.find_one(SINGLE_CHOICE_COMPONENT.uuid == self.message_uuid)
+        message_object_on_db = await EMBEDDED_MESSAGE.find_one(EMBEDDED_MESSAGE.uuid == self.message_uuid)
 
         selected_button = None
         for component_row in self.ctx.message.components:
@@ -59,7 +59,7 @@ class ChoiceButton:
                         selected_button_index = component_row.components.index(child)
 
         if not message_object_on_db:
-            message_object_on_db = await SINGLE_CHOICE_COMPONENT(
+            message_object_on_db = await EMBEDDED_MESSAGE(
                 uuid=self.message_uuid,
                 author_id=str(self.ctx.author.id),
                 counts={
@@ -84,11 +84,13 @@ class ChoiceButton:
                     round((int(vote_count_of_emoji) / sum(message_object_on_db.counts.values())) * 10))
                 self.ctx.message.embeds[0].fields[
                     field_index].value = f"{percentage_in_symbols} ({vote_count_of_emoji} votes)"
+            await self.ctx.edit_origin(embed=self.ctx.message.embeds[0],
+                                       components=self.ctx.message.components)
+            return
         else:
             if selected_button:
                 self.ctx.message.components[selected_row_index].components[selected_button_index].label = \
                 message_object_on_db.counts[selected_button.emoji.name]
             self.ctx.component.label = message_object_on_db.counts[self.ctx.component.emoji.name]
 
-        await self.ctx.edit_origin(embed=self.ctx.message.embeds[0],
-                                   components=self.ctx.message.components)
+        await self.ctx.edit_origin(components=self.ctx.message.components)

@@ -11,7 +11,7 @@ import aiohttp
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
-from common.utils.models import SINGLE_CHOICE_COMPONENT
+from common.utils.models import EMBEDDED_MESSAGE
 
 from common.utils.consts import *
 import dotenv
@@ -54,8 +54,9 @@ class DiscordClient(interactions.Client):
 
         self.disable_dm_commands = False
         self.send_command_tracebacks = False
-        self.fetch_members = True
         self.sync_interactions = True
+        self.send_not_ready_messages = True
+        self.delete_unused_application_cmds = True
 
         self.intents = intents
         self.logger = logger
@@ -75,7 +76,7 @@ async def start():
                                       server_api=ServerApi("1"))
 
     await init_beanie(mongo_client.Zeutium,
-                      document_models=[SINGLE_CHOICE_COMPONENT]) 
+                      document_models=[EMBEDDED_MESSAGE]) 
 
     client.session = aiohttp.ClientSession()
 

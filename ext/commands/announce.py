@@ -2,6 +2,8 @@ import interactions
 from common.utils.attachment import Attachment
 import os
 import uuid
+from common.utils.models import EMBEDDED_MESSAGE
+import datetime
 
 
 async def error_handler(error: Exception, ctx: interactions.BaseContext, mention=None, attachment=None, *args, **kwargs):
@@ -35,10 +37,7 @@ class Announce(interactions.Extension):
     )
     async def announce(self, ctx: interactions.SlashContext, mention=None, attachment=None):
         
-        file = None
-        if attachment:
-            await Attachment(attachment).save()
-            file = interactions.File(f"./attachments/{attachment.filename}")
+        ANNOUNCEMENT_ID = str(uuid.uuid4())
             
         announcement_modal = interactions.Modal(
             interactions.ShortText(label="Title", 
@@ -52,43 +51,24 @@ class Announce(interactions.Extension):
                                    custom_id="notes", 
                                    required=False),
             title="Create an Announcement",
-            custom_id="announcement_modal",
+            custom_id=f"announcement?{ANNOUNCEMENT_ID}",
         )
-        await ctx.send_modal(modal=announcement_modal)
-            
-        modal_ctx: interactions.ModalContext = await ctx.bot.wait_for_modal(announcement_modal)
         
-        announcement_embed: interactions.Embed = interactions.Embed(title=modal_ctx.responses["title"], 
-                                                description=modal_ctx.responses["description"],
-                                                color=ctx.author.top_role.color if ctx.guild else None)
+        if mention:
+            announcement_modal.custom_id += f"?{mention.id}"
         
-        announcement_embed.set_author(name=ctx.author.user.tag if ctx.guild else ctx.author.tag,
-                                      icon_url=ctx.author.display_avatar.url)
-        announcement_embed.set_footer(text=f"{ctx.client.footer} ? {uuid.uuid4()}")
-        announcement_embed.set_image(url=f"attachment://{attachment.filename}" if attachment else None)
-            
-        if modal_ctx.responses["notes"]:
-            announcement_embed.add_field(name="Notes:", value=modal_ctx.responses["notes"])
-            
-        components = interactions.spread_to_rows(
-            interactions.Button(
-                style=interactions.ButtonStyle.GRAY,
-                emoji="🎉",
-                label="0",
-                custom_id="announcement?{}?🎉".format(announcement_embed.footer.text.split("?")[1].replace(" ", ""))
-            ),
-            interactions.Button(
-                style=interactions.ButtonStyle.GRAY,
-                emoji="❤️",
-                label="0",
-                custom_id="announcement?{}?❤️".format(announcement_embed.footer.text.split("?")[1].replace(" ", ""))
-            )
-        )
-
-        await modal_ctx.send(embed=announcement_embed,
-                             content=mention.mention if mention else None,
-                             ephemeral=False,
-                             files=file,
-                             components=components)
+        emojis = ["🎉", "❤️"]
+        
+        await EMBEDDED_MESSAGE(uuid=ANNOUNCEMENT_ID,
+                               counts={emoji: 0 for emoji in emojis},
+                               user_ids={},
+                               created_at=datetime.datetime.utcnow(),
+                               author_id=str(ctx.author.id),
+                               attachment=attachment.filename if attachment else "None",
+                               ).create()
+        
         if attachment:
-            os.remove("./attachments/" + attachment.filename)
+            await Attachment().save(attachment)
+            
+        # Move to ext.listeners.modal_worker.py to move along
+        await ctx.send_modal(modal=announcement_modal)

@@ -1,5 +1,7 @@
 import interactions
 import uuid
+from common.utils.models import EMBEDDED_MESSAGE
+import datetime
 
 
 class Suggestion(interactions.Extension):
@@ -8,49 +10,32 @@ class Suggestion(interactions.Extension):
         
     @interactions.slash_command(description="Suggest something to the server.")
     async def suggest(self, ctx: interactions.SlashContext):
+        
+        SUGGESTION_ID = str(uuid.uuid4())
+            
         suggestion_modal = interactions.Modal(
             interactions.ShortText(label="Title", 
-                                   placeholder="Here comes the announcement title.", 
-                                   value="",
+                                   placeholder="Suggestion title", 
                                    custom_id="title"),
-            
             interactions.ParagraphText(label="Description", 
-                                       placeholder="Tell me about your announcement", 
-                                       value="",
+                                       placeholder="Suggestion details", 
                                        custom_id="description"),
             title="Create a Suggestion",
-            custom_id="suggestion_modal",
+            custom_id=f"suggestion?{SUGGESTION_ID}",
         )
+        
+        emojis = ["👍", "👎"]
+        
+        await EMBEDDED_MESSAGE(uuid=SUGGESTION_ID,
+                               counts={emoji: 0 for emoji in emojis},
+                               user_ids={},
+                               created_at=datetime.datetime.utcnow(),
+                               author_id=str(ctx.author.id),
+                               attachment="None",
+                               ).create()
+            
+        # Move to ext.listeners.modal_worker.py to move along
         await ctx.send_modal(modal=suggestion_modal)
-            
-        modal_ctx: interactions.ModalContext = await ctx.bot.wait_for_modal(suggestion_modal)
-        
-        suggestion_embed = interactions.Embed(title=modal_ctx.responses["title"], 
-                                                description=modal_ctx.responses["description"],
-                                                color=ctx.author.top_role.color if ctx.guild else None)
-        
-        suggestion_embed.set_author(name=ctx.author.user.tag if ctx.guild else ctx.author.tag, 
-                                    icon_url=ctx.author.display_avatar.url)
-        suggestion_embed.set_footer(text=f"{ctx.client.footer} ? {uuid.uuid4()}")
-            
-        components: list[interactions.ActionRow] = interactions.spread_to_rows(
-            interactions.Button(
-                style=interactions.ButtonStyle.GRAY,
-                emoji="👍",
-                label="0",
-                custom_id="suggestion?{}?👍".format(suggestion_embed.footer.text.split("?")[1].replace(" ", ""))
-            ),
-            interactions.Button(
-                style=interactions.ButtonStyle.GRAY,
-                emoji="👎",
-                label="0",
-                custom_id="suggestion?{}?👎".format(suggestion_embed.footer.text.split("?")[1].replace(" ", ""))
-            )
-        )
-
-        await modal_ctx.send(embed=suggestion_embed,
-                             ephemeral=False,
-                             components=components)
         
     async def error_handler(self, error: Exception, ctx: interactions.BaseContext, *args, **kwargs):
         match error.status:
