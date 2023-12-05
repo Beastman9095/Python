@@ -52,6 +52,8 @@ class DiscordClient(interactions.Client):
         super().__init__(*args, **kwargs)
 
         self.footer = METADATA["footer"]
+        self.sync_interactions = False
+        self.debug_scope = METADATA["guilds"][0]
 
         self.disable_dm_commands = False
         self.send_command_tracebacks = False
