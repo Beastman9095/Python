@@ -3,9 +3,8 @@ from enum import Enum
 import interactions
 
 from ext.commands.poll import Numbers
-from common.utils.models import EMBEDDED_MESSAGE
+from common.models import EMBEDDED_MESSAGE
 import datetime
-from beanie import PydanticObjectId
 
 
 class ChoiceOption(Enum):
@@ -67,6 +66,7 @@ class ChoiceButton:
                 },
                 user_ids={},
                 created_at=datetime.datetime.now(),
+                attachment="None",
             ).create()
 
         if selected_button:
@@ -90,7 +90,7 @@ class ChoiceButton:
         else:
             if selected_button:
                 self.ctx.message.components[selected_row_index].components[selected_button_index].label = \
-                message_object_on_db.counts[selected_button.emoji.name]
+                    message_object_on_db.counts[selected_button.emoji.name]
             self.ctx.component.label = message_object_on_db.counts[self.ctx.component.emoji.name]
 
         await self.ctx.edit_origin(components=self.ctx.message.components)

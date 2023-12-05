@@ -1,14 +1,29 @@
-import interactions
-from common.utils.consts import METADATA
+import importlib
+import re
+from contextlib import suppress
+
+import interactions as ipy
 from interactions.ext import prefixed_commands as prefixed
 
-def owner_check(ctx: prefixed.PrefixedContext):
-    return ctx.author.id == METADATA["owner"]
+from common.consts import METADATA
 
-class EditEmbed(interactions.Extension):
-    
+import common.utils as utils
+
+
+async def is_owner(ctx: ipy.BaseContext) -> bool:
+    return ctx.user.id == METADATA["owner"]
+
+
+class Sync(ipy.Extension):
+    def __init__(self, client: ipy.Client):
+        self.client = client
+
     @prefixed.prefixed_command()
-    @interactions.check(owner_check)
+    @ipy.check(is_owner)
     async def sync(self, ctx: prefixed.PrefixedContext):
-        await self.bot.synchronise_interactions(scopes=[METADATA["guild"], 0], delete_commands=True)
+        await self.client.synchronise_interactions(scopes=METADATA["guilds"], delete_commands=True)
         await ctx.reply(":white_check_mark: Synchronized commands.")
+
+
+def setup(client: ipy.Client):
+    Sync(client)

@@ -1,6 +1,6 @@
 import interactions
 import uuid
-from common.utils.consts import METADATA
+from common.consts import METADATA
 
 
 class Numbers():
@@ -13,7 +13,8 @@ class Poll(interactions.Extension):
         self.set_extension_error(self.error_handler)
         self.numbers = Numbers().numbers
 
-    @interactions.slash_command(description="Create a poll for the server", scopes=[METADATA["guild"]])
+    @interactions.slash_command(description="Create a poll for the server",
+                                scopes=METADATA["guilds"])
     @interactions.slash_option(
         name="description",
         description="A description for the poll",
@@ -34,7 +35,8 @@ class Poll(interactions.Extension):
                                    placeholder="Here comes the poll title.",
                                    custom_id="title"),
             interactions.ParagraphText(label="Options",
-                                       placeholder="Input your options here, each starting with \"-\", for eg.\n-Option1\n-Option2\n.\n.\n.",
+                                       placeholder="Input your options here, each starting with \"-\", "
+                                                   "for eg.\n-Option1\n-Option2\n.\n.\n.",
                                        custom_id="options"),
             title="Create a Poll",
             custom_id=f"poll?{POLL_ID}",

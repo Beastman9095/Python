@@ -11,11 +11,11 @@ import aiohttp
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
-from common.utils.models import EMBEDDED_MESSAGE
+from common.models import EMBEDDED_MESSAGE
 
 from interactions.ext import prefixed_commands
 
-from common.utils.consts import *
+from common.consts import *
 import dotenv
 
 dotenv.load_dotenv()
@@ -52,11 +52,9 @@ class DiscordClient(interactions.Client):
         super().__init__(*args, **kwargs)
 
         self.footer = METADATA["footer"]
-        self.debug_scope = METADATA["guild"]
 
         self.disable_dm_commands = False
         self.send_command_tracebacks = False
-        self.sync_interactions = True
         self.send_not_ready_messages = True
         self.delete_unused_application_cmds = True
 
@@ -88,6 +86,8 @@ async def start():
         for file in files:
             if file.endswith('.py'):
                 client.load_extension(os.path.join(root, file)[:-3].replace('/', '.').replace('\\', '.'))
+
+    client.load_extension("interactions.ext.jurigged", poll=True)
 
     try:
         await client.astart(os.environ["TOKEN"])
