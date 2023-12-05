@@ -6,18 +6,13 @@ from ext.commands.poll import Numbers
 from common.models import EMBEDDED_MESSAGE
 import datetime
 
+from interactions.api.events import Component
+
 
 class ChoiceOption(Enum):
     ANNOUNCEMENT = "announcement"
     SUGGESTION = "suggestion"
     POLL = "poll"
-
-
-async def poll_get_vote_count_from_emoji(emoji, embed):
-    field_index = [(Numbers().numbers.index(k)) for k in Numbers().numbers if k == emoji][0]
-    button_field = embed.fields[field_index]
-    vote_count_for_emoji = button_field.value.split("(")[1].split(" ")[0]
-    return vote_count_for_emoji
 
 
 def percentage_showcase(percentage):
@@ -29,18 +24,31 @@ def percentage_showcase(percentage):
     return percentage_in_symbols
 
 
-class SelectedButton(interactions.Button):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class ChoiceButton(interactions.Extension):
+    def __init__(self, client: interactions.Client):
 
-
-class ChoiceButton:
-    def __init__(self, ctx):
-        self.ctx = ctx
-        self.client = self.ctx.client
+        self.ctx = None
+        self.client = client
         self.message_uuid = None
-        self.filter_get_doc = {"_id": ctx.component.custom_id.split("?")[1]}
+        self.filter_get_doc = None
         self.options_of_message = []
+
+    @interactions.listen(Component)
+    async def on_component(self, event: Component):
+        self.ctx = event.ctx
+        self.filter_get_doc = {"_id": self.ctx.component.custom_id.split("?")[1]}
+
+        match self.ctx.custom_id.split("?")[0]:
+            case "announcement":
+                await self.callback(ChoiceOption.ANNOUNCEMENT)
+                return
+            case "suggestion":
+                await self.callback(ChoiceOption.SUGGESTION)
+                return
+            case "poll":
+                await self.callback(ChoiceOption.POLL)
+                return
+        pass
 
     async def callback(self, option):
         self.message_uuid = self.ctx.component.custom_id.split("?")[1]

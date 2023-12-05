@@ -1,6 +1,3 @@
-from common.utils.choice_components import ChoiceButton, ChoiceOption
-
-from interactions.api.events import Component
 import interactions
 
 import os
@@ -96,21 +93,6 @@ async def start():
     finally:
         await client.session.close()
 
-
-@interactions.listen(Component)
-async def on_component(event: Component):
-    ctx = event.ctx
-    match ctx.custom_id.split("?")[0]:
-        case "announcement":
-            await ChoiceButton(ctx).callback(ChoiceOption.ANNOUNCEMENT)
-            return
-        case "suggestion":
-            await ChoiceButton(ctx).callback(ChoiceOption.SUGGESTION)
-            return
-        case "poll":
-            await ChoiceButton(ctx).callback(ChoiceOption.POLL)
-            return
-    pass
             
 if __name__ == "__main__":
     try:
