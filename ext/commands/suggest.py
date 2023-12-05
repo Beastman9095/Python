@@ -2,13 +2,14 @@ import interactions
 import uuid
 from common.utils.models import EMBEDDED_MESSAGE
 import datetime
+from common.utils.consts import METADATA
 
 
 class Suggestion(interactions.Extension):
     def __init__(self, bot: interactions.Client):
         self.set_extension_error(self.error_handler)
         
-    @interactions.slash_command(description="Suggest something to the server.")
+    @interactions.slash_command(description="Suggest something to the server.", scopes=[METADATA["guild"]])
     async def suggest(self, ctx: interactions.SlashContext):
         
         SUGGESTION_ID = str(uuid.uuid4())

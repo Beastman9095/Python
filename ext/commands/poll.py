@@ -13,7 +13,7 @@ class Poll(interactions.Extension):
         self.set_extension_error(self.error_handler)
         self.numbers = Numbers().numbers
 
-    @interactions.slash_command(description="Create a poll for the server")
+    @interactions.slash_command(description="Create a poll for the server", scopes=[METADATA["guild"]])
     @interactions.slash_option(
         name="description",
         description="A description for the poll",

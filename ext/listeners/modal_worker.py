@@ -101,4 +101,5 @@ class ModalWorker(interactions.Extension):
                        file=file,
                        components=components)
         
-        await Attachment().delete(file)
+        if file:
+            await Attachment().delete(file)

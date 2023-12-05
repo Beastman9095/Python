@@ -1,8 +1,9 @@
 import interactions
+from common.utils.consts import METADATA
 
 class EditEmbed(interactions.Extension):
     
-    @interactions.message_context_menu(name="Edit Embed")
+    @interactions.message_context_menu(name="Edit Embed", scopes=[METADATA["guild"]])
     async def edit_embed(self, ctx: interactions.ContextMenuContext):
         edit_modal = interactions.Modal(
             interactions.ShortText(label="Title", 

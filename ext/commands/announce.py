@@ -3,6 +3,7 @@ from common.utils.attachment import Attachment
 import os
 import uuid
 from common.utils.models import EMBEDDED_MESSAGE
+from common.utils.consts import METADATA
 import datetime
 
 
@@ -22,7 +23,7 @@ class Announce(interactions.Extension):
     def __init__(self, bot: interactions.Client):
         self.set_extension_error(error_handler)
     
-    @interactions.slash_command(description="Announce something to the server!")
+    @interactions.slash_command(description="Announce something to the server!", scopes=[METADATA["guild"]])
     @interactions.slash_option(
         name="mention",
         description="Mention a user or a role!",

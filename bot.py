@@ -13,6 +13,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
 from common.utils.models import EMBEDDED_MESSAGE
 
+from interactions.ext import prefixed_commands
+
 from common.utils.consts import *
 import dotenv
 
@@ -69,6 +71,8 @@ class DiscordClient(interactions.Client):
 
 
 client = DiscordClient()
+
+prefixed_commands.setup(client)
 
 
 async def start():
