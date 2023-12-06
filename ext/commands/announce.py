@@ -6,16 +6,17 @@ from common.models import EMBEDDED_MESSAGE
 from common.consts import METADATA
 import datetime
 
+"""
+This extension integrates a slash command to create announcements.
 
-async def error_handler(error: Exception, ctx: interactions.BaseContext, mention=None, attachment=None, *args, **kwargs):
-    match error.status:
-        case 404:
-            await ctx.send(f"Interaction timed out.", ephemeral=True)
-            if attachment is not None:
-                os.remove("./attachments/" + attachment.filename)
-            return
+__Purpose:__ Receive the \"announce\" application command context from the user and process it. Following this 
+it responds to the user with a modal to create the announcement desired. If an attachment has been chosen,
+it is saved locally to ./attachments/ and the filename is stored in the EMBEDDED_MESSAGE as `attachment`.
+In the case of a mention input, it is stored in the modal custom_id as `mention.id` which is later used to
+fetch either the role oobject or the user object.
 
-    raise error
+__Utilizes:__ modal_worker.py && component_worker.py
+"""
 
 
 class Announce(interactions.Extension):
@@ -39,6 +40,8 @@ class Announce(interactions.Extension):
     )
     async def announce(self, ctx: interactions.SlashContext, mention=None, attachment=None):
         
+        # Unique identifier for the announcement on the database
+        # Stored in embed footer as well for easy access
         ANNOUNCEMENT_ID = str(uuid.uuid4())
             
         announcement_modal = interactions.Modal(
@@ -61,6 +64,8 @@ class Announce(interactions.Extension):
         
         emojis = ["🎉", "❤️"]
         
+        # The code creates a MongoDB document with the following data set
+        # Attachment needs to be specified as "None" due to library limitations, it was either that or a blank string
         await EMBEDDED_MESSAGE(uuid=ANNOUNCEMENT_ID,
                                counts={emoji: 0 for emoji in emojis},
                                user_ids={},
@@ -74,3 +79,14 @@ class Announce(interactions.Extension):
             
         # Move to ext.listeners.modal_worker.py to move along
         await ctx.send_modal(modal=announcement_modal)
+
+
+async def error_handler(error: Exception, ctx: interactions.BaseContext, _, attachment=None, *args, **kwargs):
+    match error.status:
+        case 404:
+            await ctx.send(f"Interaction timed out.", ephemeral=True)
+            if attachment is not None:
+                os.remove("./attachments/" + attachment.filename)
+            return
+
+    raise error

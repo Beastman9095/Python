@@ -10,6 +10,11 @@ from common.consts import METADATA
 import common.utils as utils
 
 
+"""
+This extension is used to synchronize the application commands and context menus with the Discord API.
+"""
+
+
 async def is_owner(ctx: ipy.BaseContext) -> bool:
     return ctx.user.id == METADATA["owner"]
 

@@ -1,53 +1,54 @@
 import interactions
-from common.models import EMBEDDED_MESSAGE
 import uuid
-from common.utils.attachment import Attachment
 import datetime
 import re
-from ext.commands.poll import Numbers
+
+from common.utils.attachment import Attachment
 from common.utils.embeds import Modal_Response_Embed
+
+from common.models import EMBEDDED_MESSAGE
+
+from ext.commands.poll import Numbers
 
 
 class ModalWorker(interactions.Extension):
 
     def __init__(self, _):
-        self.numbers = Numbers().numbers
+        self.numbers: list = Numbers().numbers
 
     @interactions.listen("modal_completion")
     async def modal_handling(self, event: interactions.events.ModalCompletion):
         ctx = event.ctx
+        
         embed = Modal_Response_Embed(ctx, title=ctx.responses["title"],
                                      color=ctx.author.top_role.color if ctx.guild else None)
-
         embed.set_author_from_ctx(ctx)
-
         embed.set_footer(text=f"{ctx.client.footer} ? {uuid.uuid4()}")
 
         match ctx.custom_id.split("?")[0]:
             case "announcement":
                 embed.description = ctx.responses["description"]
-
                 if ctx.responses["notes"]:
                     embed.add_field(name="Notes:", value=ctx.responses["notes"])
-
+                    
                 await self.receive_modal(ctx, embed)
                 return
             case "suggestion":
                 embed.description = ctx.responses["description"]
-
+                
                 await self.receive_modal(ctx, embed)
                 return
             case "poll":
+                
                 await self.receive_modal(ctx, embed)
                 return
 
     async def receive_modal(self, ctx: interactions.ModalContext, embed: interactions.Embed):
-
         modal_type = ctx.custom_id.split("?")[0]
-
-        if not (
-                embedded_message := await EMBEDDED_MESSAGE.find_one(
-                    EMBEDDED_MESSAGE.uuid == ctx.custom_id.split("?")[1])):
+        message_uuid = ctx.custom_id.split("?")[1]
+        
+        if not (embedded_message := await EMBEDDED_MESSAGE.find_one(
+                    EMBEDDED_MESSAGE.uuid == message_uuid)):
 
             if not re.match("(-(.+)\n)+-(.+)", ctx.responses["options"]):
                 await ctx.send("Invalid options provided. Please try again.", ephemeral=True)
@@ -73,29 +74,22 @@ class ModalWorker(interactions.Extension):
             embed.set_image("attachment://" + embedded_message.attachment)
             file = await Attachment().get(embedded_message.attachment)
 
-        store_components = []
-
-        for emoji in embedded_message.counts.keys():
-            store_components.append(
-                interactions.Button(
+        components = interactions.spread_to_rows(
+            *[interactions.Button(
                     style=interactions.ButtonStyle.GRAY if modal_type != "poll" else interactions.ButtonStyle.BLURPLE,
                     emoji=emoji,
                     label=embedded_message.counts[emoji] if modal_type != "poll" else None,
                     custom_id=f"{ctx.custom_id.split('?')[0]}?{ctx.custom_id.split('?')[1]}?{emoji}"
-                )
-            )
-
-        components = interactions.spread_to_rows(
-            *store_components
+                ) for emoji in embedded_message.counts.keys()]
         )
 
         mention = None
         if len(ctx.custom_id.split("?")) == 3:
             mention_id = int(ctx.custom_id.split("?")[2])
-            if member := await ctx.client.fetch_user(mention_id):
-                mention = member.mention
-            elif role := await ctx.guild.fetch_role(mention_id):
-                mention = role.mention
+            if mentioned_member := await ctx.client.fetch_user(mention_id):
+                mention = mentioned_member.mention
+            elif mentioned_role := await ctx.guild.fetch_role(mention_id):
+                mention = mentioned_role.mention
 
         await ctx.send(content=mention,
                        embed=embed,

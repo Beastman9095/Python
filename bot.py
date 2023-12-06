@@ -3,17 +3,17 @@ import interactions
 import os
 import asyncio
 import logging
-
+import dotenv
 import aiohttp
+
 from beanie import init_beanie
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.server_api import ServerApi
-from common.models import EMBEDDED_MESSAGE
-
 from interactions.ext import prefixed_commands
 
+
+from common.models import EMBEDDED_MESSAGE
 from common.consts import *
-import dotenv
 
 dotenv.load_dotenv()
 
@@ -85,8 +85,6 @@ async def start():
         for file in files:
             if file.endswith('.py'):
                 client.load_extension(os.path.join(root, file)[:-3].replace('/', '.').replace('\\', '.'))
-
-    client.load_extension("interactions.ext.jurigged", poll=True)
 
     try:
         await client.astart(os.environ["TOKEN"])

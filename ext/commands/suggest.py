@@ -4,6 +4,15 @@ from common.models import EMBEDDED_MESSAGE
 import datetime
 from common.consts import METADATA
 
+"""
+This extension integrates a slash command to create suggestions.
+
+__Purpose:__ Receive the \"suggest\" application command context from the user and process it. Following this 
+it responds to the user with a modal to create the suggestion desired.
+
+__Utilizes:__ modal_worker.py && component_worker.py
+"""
+
 
 class Suggestion(interactions.Extension):
     def __init__(self, bot: interactions.Client):
@@ -13,6 +22,8 @@ class Suggestion(interactions.Extension):
                                 scopes=METADATA["guilds"])
     async def suggest(self, ctx: interactions.SlashContext):
         
+        # Unique identifier for the suggestion on the database
+        # Stored in embed footer as well for easy access
         SUGGESTION_ID = str(uuid.uuid4())
             
         suggestion_modal = interactions.Modal(
@@ -28,6 +39,8 @@ class Suggestion(interactions.Extension):
         
         emojis = ["👍", "👎"]
         
+        # The code creates a MongoDB document with the following data set
+        # Attachment needs to be specified as "None" due to library limitations, it was either that or a blank string
         await EMBEDDED_MESSAGE(uuid=SUGGESTION_ID,
                                counts={emoji: 0 for emoji in emojis},
                                user_ids={},
