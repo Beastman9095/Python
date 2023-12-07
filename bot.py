@@ -13,6 +13,7 @@ from interactions.ext import prefixed_commands
 
 
 from common.models import EMBEDDED_MESSAGE
+from common.utils.formatter import CustomFormatter
 from common.consts import *
 
 dotenv.load_dotenv()
@@ -22,12 +23,14 @@ logger = logging.getLogger("zeutium_core_bot")
 logger.setLevel(logging.DEBUG)
 
 stderr_handler = logging.StreamHandler()
-stderr_handler.setLevel(logging.WARNING)
+# Change to logging.DEBUG to see debug messages
+stderr_handler.setLevel(logging.INFO)
+stderr_handler.setFormatter(CustomFormatter())
 logger.addHandler(stderr_handler)
 
 file_handler = logging.FileHandler(filename="discord.log", encoding="utf-8", mode="a")
-file_handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
 file_handler.setLevel(logging.INFO)
+file_handler.setFormatter(CustomFormatter())
 logger.addHandler(file_handler)
 
 

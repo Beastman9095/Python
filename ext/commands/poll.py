@@ -61,7 +61,10 @@ class Poll(interactions.Extension):
         
         # EMBEDDED_MESSAGE documents of polls are created in the modal_worker as the options are dynamic
         
-        # Move to ext.listeners.modal_worker.py to move along
+        """
+        After the modal is sent the actions take place in the following order:
+        ext.listeners.modal_worker.py -> ext.listeners.component_worker.py
+        """
         await ctx.send_modal(modal=poll_modal)
 
     async def error_handler(self, error: Exception, ctx: interactions.BaseContext, *args, **kwargs):

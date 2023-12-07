@@ -64,7 +64,6 @@ class Announce(interactions.Extension):
         
         emojis = ["🎉", "❤️"]
         
-        # The code creates a MongoDB document with the following data set
         # Attachment needs to be specified as "None" due to library limitations, it was either that or a blank string
         await EMBEDDED_MESSAGE(uuid=ANNOUNCEMENT_ID,
                                counts={emoji: 0 for emoji in emojis},
@@ -77,7 +76,10 @@ class Announce(interactions.Extension):
         if attachment:
             await Attachment().save(attachment)
             
-        # Move to ext.listeners.modal_worker.py to move along
+        """
+        After the modal is sent the actions take place in the following order:
+        ext.listeners.modal_worker.py -> ext.listeners.component_worker.py
+        """
         await ctx.send_modal(modal=announcement_modal)
 
 

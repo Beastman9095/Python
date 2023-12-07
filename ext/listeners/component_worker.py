@@ -85,7 +85,6 @@ class ChoiceButton(interactions.Extension):
 
         if option == ChoiceOption.POLL:
             await self.handle_poll_option(embedded_message_document, self.options_of_message)
-            return
         else:
             component_custom_id = "{}?{}".format(self.ctx.component.custom_id.split("?")[0],
                                                  self.ctx.component.custom_id.split("?")[1])
@@ -96,8 +95,8 @@ class ChoiceButton(interactions.Extension):
                                                                         style=interactions.ButtonStyle.GRAY, 
                                                                         custom_id=f"{component_custom_id}?{emoji}") 
                     for emoji in embedded_message_document.counts.keys()])
-
-        await self.ctx.edit_origin(components=components)
+            
+            await self.ctx.edit_origin(components=components)
         
         
     async def handle_poll_option(self, embedded_message_document, options_of_message):
