@@ -21,9 +21,6 @@ __Utilizes:__ modal_worker.py && component_worker.py
 
 class Announce(interactions.Extension):
     
-    def __init__(self, bot: interactions.Client):
-        self.set_extension_error(error_handler)
-    
     @interactions.slash_command(description="Announce something to the server!",
                                 scopes=METADATA["guilds"])
     @interactions.slash_option(
@@ -81,14 +78,3 @@ class Announce(interactions.Extension):
         ext.listeners.modal_worker.py -> ext.listeners.component_worker.py
         """
         await ctx.send_modal(modal=announcement_modal)
-
-
-async def error_handler(error: Exception, ctx: interactions.BaseContext, _, attachment=None, *args, **kwargs):
-    match error.status:
-        case 404:
-            await ctx.send(f"Interaction timed out.", ephemeral=True)
-            if attachment is not None:
-                os.remove("./attachments/" + attachment.filename)
-            return
-
-    raise error
