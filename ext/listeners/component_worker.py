@@ -84,7 +84,7 @@ class ChoiceButton(interactions.Extension):
         await embedded_message_document.save()
 
         if option == ChoiceOption.POLL:
-            self.handle_poll_option(embedded_message_document, self.options_of_message)
+            await self.handle_poll_option(embedded_message_document, self.options_of_message)
             return
         else:
             component_custom_id = "{}?{}".format(self.ctx.component.custom_id.split("?")[0],
