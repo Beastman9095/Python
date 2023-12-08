@@ -156,3 +156,4 @@ cython_debug/
 .gitattributes
 .DS_STORE
 common/.DS_STORE
+ext/testing

@@ -15,8 +15,6 @@ __Utilizes:__ modal_worker.py && component_worker.py
 
 
 class Suggestion(interactions.Extension):
-    def __init__(self, bot: interactions.Client):
-        self.set_extension_error(self.error_handler)
         
     @interactions.slash_command(description="Suggest something to the server.",
                                 scopes=METADATA["guilds"])
@@ -53,11 +51,3 @@ class Suggestion(interactions.Extension):
         ext.listeners.modal_worker.py -> ext.listeners.component_worker.py
         """
         await ctx.send_modal(modal=suggestion_modal)
-        
-    async def error_handler(self, error: Exception, ctx: interactions.BaseContext, *args, **kwargs):
-        match error.status:
-            case 404:
-                await ctx.send(f"Interaction timed out.", ephemeral=True)
-                return
-                
-        raise(error)

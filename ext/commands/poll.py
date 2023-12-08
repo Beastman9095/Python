@@ -24,8 +24,6 @@ class Numbers():
 class Poll(interactions.Extension):
     def __init__(self, bot: interactions.Client):
         self.numbers: list = Numbers().numbers
-        
-        self.set_extension_error(self.error_handler)
 
     @interactions.slash_command(description="Create a poll for the server",
                                 scopes=METADATA["guilds"])
@@ -66,11 +64,3 @@ class Poll(interactions.Extension):
         ext.listeners.modal_worker.py -> ext.listeners.component_worker.py
         """
         await ctx.send_modal(modal=poll_modal)
-
-    async def error_handler(self, error: Exception, ctx: interactions.BaseContext, *args, **kwargs):
-        match error.status:
-            case 404:
-                await ctx.send(f"Interaction timed out.", ephemeral=True)
-                return
-
-        raise (error)
