@@ -1,3 +1,15 @@
+## Installation
+
+!! USE Python 3.11
+
+First of all, initialize a MongoDB database on their website as you will need one. You only need a connection URL so just an account + database without any collections would suffice. Secondly, input your token and mongo url in the .env file. Don't forget to edit metadata.yml up to your preferences. After you're done with all of these you should be aware that all permissions are handled manually on your end. You can disable usages for commands by specific people/role or allow for specific people/role through discord server settings, integrations.
+
+You can run the bot with
+
+```
+python bot.py
+```
+
 ## Main Features
 
 ### Announcements (ext.commands.announce.py)
