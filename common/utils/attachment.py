@@ -13,6 +13,11 @@ class Attachment:
                 image_data = Image.open(io.BytesIO(await response.read()))
                 image_data.save(f"./attachments/{attachment_filename}")
                 
+    async def get_bytes(self, attachment_url: str):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(attachment_url) as response:
+                return await response.read()
+                
     async def get(self, attachment_name: str):
         return interactions.File(f"./attachments/{attachment_name}")
                 

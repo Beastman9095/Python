@@ -27,5 +27,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # Copy the source code into the container.
 COPY . .
 
+COPY .env.example .env
+
+RUN git clone https://github.com/Beastman9095/Zeutium-Core-Bot
+
 # Run the application.
 CMD python3 bot.py

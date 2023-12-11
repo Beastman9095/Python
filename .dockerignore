@@ -7,7 +7,7 @@
 **/.DS_Store
 **/__pycache__
 **/.venv
-**/.vscode
+**/.env
 **/.classpath
 **/.dockerignore
 **/.git

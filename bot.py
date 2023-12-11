@@ -24,7 +24,7 @@ logger.setLevel(logging.DEBUG)
 
 stderr_handler = logging.StreamHandler()
 # Change to logging.DEBUG to see debug messages
-stderr_handler.setLevel(logging.INFO)
+stderr_handler.setLevel(logging.WARNING)
 stderr_handler.setFormatter(CustomFormatter())
 logger.addHandler(stderr_handler)
 

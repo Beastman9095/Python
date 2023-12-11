@@ -1,4 +1,8 @@
 services:
-  server:
+  zeutium-bot:
     build:
       context: .
+    environment:
+      TOKEN: ${TOKEN}
+      APPID: ${APPID}
+      MONGO_URI: ${MONGO_URI}
