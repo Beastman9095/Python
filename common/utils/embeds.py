@@ -12,3 +12,8 @@ class Modal_Response_Embed(interactions.Embed):
         self.set_author(name=ctx.author.user.tag if ctx.guild else ctx.author.tag,
                         icon_url=ctx.author.display_avatar.url)
         return
+    
+    def set_image(self, url):
+        super().set_image(url)
+        return
+        

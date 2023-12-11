@@ -7,11 +7,11 @@ import interactions
 
 class Attachment:
     
-    async def save(self, attachment: interactions.Attachment):
+    async def save(self, attachment_url: str, attachment_filename: str):
         async with aiohttp.ClientSession() as session:
-            async with session.get(attachment.url) as response:
+            async with session.get(attachment_url) as response:
                 image_data = Image.open(io.BytesIO(await response.read()))
-                image_data.save(f"./attachments/{attachment.filename}")
+                image_data.save(f"./attachments/{attachment_filename}")
                 
     async def get(self, attachment_name: str):
         return interactions.File(f"./attachments/{attachment_name}")

@@ -71,7 +71,7 @@ class Announce(interactions.Extension):
                                ).create()
         
         if attachment:
-            await Attachment().save(attachment)
+            await Attachment().save(attachment.url, attachment.filename)
             
         """
         After the modal is sent the actions take place in the following order:

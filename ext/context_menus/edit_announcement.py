@@ -1,5 +1,6 @@
 import interactions
 from common.consts import METADATA
+from common.utils.attachment import Attachment
 from common.utils.embeds import Modal_Response_Embed
 
 
@@ -33,10 +34,22 @@ class EditAnnouncement(interactions.Extension):
 
         edited_embed = Modal_Response_Embed(modal_ctx, title=modal_ctx.responses["title"],
                                             description=modal_ctx.responses["description"])
+        
+        file = None
+        if ctx.target.embeds[0].image:
+            image_url = ctx.target.embeds[0].image.url
+            image_name = image_url.split("?")[0].split("/")[-1]
+            
+            await Attachment().save(image_url, image_name)
+            
+            file = interactions.File("./attachments/" + image_name)
+            edited_embed.set_image(f"attachment://{image_name}")
 
         edited_embed.set_footer(ctx.target.embeds[0].footer.text)
 
         if modal_ctx.responses["notes"]:
             edited_embed.add_field(name="Notes:", value=modal_ctx.responses["notes"])
 
-        await modal_ctx.edit(ctx.target, embed=edited_embed, attachments=[])
+        await modal_ctx.edit(ctx.target, embed=edited_embed, attachments=[], file=file)
+        
+        await Attachment().delete(file) if file else None
