@@ -1,5 +1,6 @@
 import interactions
-from common.consts import METADATA
+from io import BytesIO
+
 from common.utils.attachment import Attachment
 from common.utils.embeds import Modal_Response_Embed
 
@@ -49,7 +50,8 @@ class EditAnnouncement(interactions.Extension):
         if ctx.target.embeds[0].image:
             image_url = ctx.target.embeds[0].image.url
             image_name = image_url.split("?")[0].split("/")[-1]
-            file = interactions.File(await Attachment().get_bytes(image_url), image_name)
+            file = interactions.File(file=BytesIO(await Attachment().get_bytes(image_url)), 
+                                     file_name=image_name)
             edited_embed.set_image(f"attachment://{image_name}")
 
         edited_embed.set_footer(ctx.target.embeds[0].footer.text)
