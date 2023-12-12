@@ -60,10 +60,6 @@ class ChoiceButton(interactions.Extension):
         user_id = str(self.ctx.user.id)
 
         self.options_of_message = [child for component_row in self.ctx.message.components for child in component_row.components]
-        selected_button = next((child 
-                                for child in self.options_of_message 
-                                if embedded_message_document.user_ids.get(user_id, None) == child.emoji.name), 
-                               None)
 
         embedded_message_document = await EMBEDDED_MESSAGE(
             uuid=self.message_uuid,
@@ -76,6 +72,11 @@ class ChoiceButton(interactions.Extension):
             attachment="None",
         ).create() if not embedded_message_document else embedded_message_document
 
+        selected_button = next((child 
+                                for child in self.options_of_message 
+                                if embedded_message_document.user_ids.get(user_id, None) == child.emoji.name), 
+                               None)
+        
         if selected_button:
             embedded_message_document.counts[selected_button.emoji.name] -= 1
         embedded_message_document.counts[self.ctx.component.emoji.name] += 1
