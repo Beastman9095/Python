@@ -7,10 +7,9 @@ from common.utils.embeds import Modal_Response_Embed
 class EditAnnouncement(interactions.Extension):
     
     def checkAuthor(self, ctx):
-        if not ctx.target.embeds[0]:
-            return
-        if not ctx.target.embeds[0].author.name == ctx.author.tag:
-            return
+        if not ctx.target.embeds[0] or not ctx.target.embeds[0].author.name == ctx.author.user.tag:
+            return False
+        return True
 
     @interactions.message_context_menu(name="Edit Announcement")
     async def edit_embed(self, ctx: interactions.ContextMenuContext):
@@ -41,9 +40,12 @@ class EditAnnouncement(interactions.Extension):
 
         modal_ctx: interactions.ModalContext = await ctx.bot.wait_for_modal(edit_modal)
 
-        edited_embed = Modal_Response_Embed(modal_ctx, title=modal_ctx.responses["title"],
+        edited_embed = Modal_Response_Embed(modal_ctx, 
+                                            title=modal_ctx.responses["title"],
+                                            color=ctx.author.top_role.color,
                                             description=modal_ctx.responses["description"])
         
+        file = None
         if ctx.target.embeds[0].image:
             image_url = ctx.target.embeds[0].image.url
             image_name = image_url.split("?")[0].split("/")[-1]
@@ -51,6 +53,7 @@ class EditAnnouncement(interactions.Extension):
             edited_embed.set_image(f"attachment://{image_name}")
 
         edited_embed.set_footer(ctx.target.embeds[0].footer.text)
+        edited_embed.set_author_from_ctx(ctx)
 
         if modal_ctx.responses["notes"]:
             edited_embed.add_field(name="Notes:", value=modal_ctx.responses["notes"])

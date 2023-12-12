@@ -1,7 +1,6 @@
-import typing
 from datetime import datetime
 
-from beanie import Document, Indexed
+from beanie import Document
 
 __all__ = ("EMBEDDED_MESSAGE",)
 

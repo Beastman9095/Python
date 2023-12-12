@@ -3,5 +3,5 @@ services:
     build:
       context: .
     environment:
-      TOKEN: ${BOT_TOKEN}
-      MONGO_URI: ${BOT_MONGO_URI}
+      TOKEN: ${TOKEN}
+      MONGO_URI: ${MONGO_URI}

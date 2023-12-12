@@ -2,7 +2,6 @@ import interactions
 import uuid
 from common.models import EMBEDDED_MESSAGE
 import datetime
-from common.consts import METADATA
 
 """
 This extension integrates a slash command to create suggestions.

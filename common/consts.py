@@ -1,7 +1,6 @@
 import os
 import typing
 from pathlib import Path
-import interactions
 
 import yaml
 

@@ -56,6 +56,9 @@ class Poll(interactions.Extension):
             custom_id=f"poll?{POLL_ID}",
         )
         
+        if mention:
+            poll_modal.custom_id += f"?{mention.id}"
+        
         # EMBEDDED_MESSAGE documents of polls are created in the modal_worker as the options are dynamic
         
         """

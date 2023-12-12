@@ -16,7 +16,7 @@ from common.models import EMBEDDED_MESSAGE
 from common.utils.formatter import CustomFormatter
 from common.consts import *
 
-dotenv.load_dotenv()
+dotenv.load_dotenv(".env")
 
 
 logger = logging.getLogger("zeutium_core_bot")
@@ -37,14 +37,7 @@ logger.addHandler(file_handler)
 activity = interactions.Activity.create(name="on play.zeutium.com",
                                         type=interactions.ActivityType.PLAYING)
 
-intents = interactions.Intents.new(
-    guilds=True,
-    guild_members=True,
-    guild_moderation=True,
-    guild_messages=True,
-    direct_messages=True,
-    message_content=True,
-)
+intents = interactions.Intents.DEFAULT
 
 
 class DiscordClient(interactions.Client):
@@ -52,8 +45,8 @@ class DiscordClient(interactions.Client):
         super().__init__(*args, **kwargs)
 
         self.footer = METADATA["footer"]
-        self.sync_interactions = False
 
+        self.sync_interactions = True
         self.disable_dm_commands = False
         self.send_command_tracebacks = False
         self.send_not_ready_messages = True
@@ -78,12 +71,12 @@ async def start():
     mongo_client = AsyncIOMotorClient(os.environ["MONGO_URI"],
                                       server_api=ServerApi("1"))
 
-    await init_beanie(mongo_client.Zeutium,
+    await init_beanie(mongo_client.zeutium_core_bot,
                       document_models=[EMBEDDED_MESSAGE]) 
 
     client.session = aiohttp.ClientSession()
 
-    for root, dirs, files in os.walk("ext"):
+    for root, _, files in os.walk("ext"):
         for file in files:
             if file.endswith('.py'):
                 client.load_extension(os.path.join(root, file)[:-3].replace('/', '.').replace('\\', '.'))
