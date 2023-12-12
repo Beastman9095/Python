@@ -26,7 +26,7 @@ class Sync(ipy.Extension):
     @prefixed.prefixed_command()
     @ipy.check(is_owner)
     async def sync(self, ctx: prefixed.PrefixedContext):
-        await self.client.synchronise_interactions(scopes=METADATA["guilds"], delete_commands=True)
+        await self.client.synchronise_interactions(delete_commands=True)
         await ctx.reply(":white_check_mark: Synchronized commands.")
 
 

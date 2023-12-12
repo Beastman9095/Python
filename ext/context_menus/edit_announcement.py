@@ -5,10 +5,19 @@ from common.utils.embeds import Modal_Response_Embed
 
 
 class EditAnnouncement(interactions.Extension):
+    
+    def checkAuthor(self, ctx):
+        if not ctx.target.embeds[0]:
+            return
+        if not ctx.target.embeds[0].author.name == ctx.author.tag:
+            return
 
-    @interactions.message_context_menu(name="Edit Announcement",
-                                       scopes=METADATA["guilds"])
+    @interactions.message_context_menu(name="Edit Announcement")
     async def edit_embed(self, ctx: interactions.ContextMenuContext):
+        
+        if not self.checkAuthor(ctx):
+            return await ctx.send("Something went wrong.", ephemeral=True)
+        
         edit_modal = interactions.Modal(
             interactions.ShortText(label="Title",
                                    placeholder="Here comes the announcement title.",

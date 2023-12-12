@@ -25,8 +25,7 @@ class Poll(interactions.Extension):
     def __init__(self, bot: interactions.Client):
         self.numbers: list = Numbers().numbers
 
-    @interactions.slash_command(description="Create a poll for the server",
-                                scopes=METADATA["guilds"])
+    @interactions.slash_command(description="Create a poll for the server")
     @interactions.slash_option(
         name="description",
         description="A description for the poll",

@@ -1,9 +1,7 @@
 import interactions
 from common.utils.attachment import Attachment
-import os
 import uuid
 from common.models import EMBEDDED_MESSAGE
-from common.consts import METADATA
 import datetime
 
 """
@@ -21,8 +19,7 @@ __Utilizes:__ modal_worker.py && component_worker.py
 
 class Announce(interactions.Extension):
     
-    @interactions.slash_command(description="Announce something to the server!",
-                                scopes=METADATA["guilds"])
+    @interactions.slash_command(description="Announce something to the server!")
     @interactions.slash_option(
         name="mention",
         description="Mention a user or a role!",

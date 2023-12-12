@@ -16,8 +16,7 @@ __Utilizes:__ modal_worker.py && component_worker.py
 
 class Suggestion(interactions.Extension):
         
-    @interactions.slash_command(description="Suggest something to the server.",
-                                scopes=METADATA["guilds"])
+    @interactions.slash_command(description="Suggest something to the server.")
     async def suggest(self, ctx: interactions.SlashContext):
         
         # Unique identifier for the suggestion on the database

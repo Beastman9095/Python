@@ -14,7 +14,6 @@ SRC_PATH = Path(__file__).parent.parent.absolute().as_posix()
 
 class MetadataTyping(typing.TypedDict):
     guild: int
-    channels: dict[str, int]
     footer: str
 
 
